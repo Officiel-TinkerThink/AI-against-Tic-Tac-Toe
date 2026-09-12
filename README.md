@@ -1,66 +1,91 @@
-# AI-against Tic-Tac-Toe
-This Game implementing AI to play against users
+<div align="center">
 
-## Overview
+# ✕◯ Tic-Tac-Toe vs Minimax
 
-This project involves building an AI agent to play Tic-Tac-Toe optimally using the `Minimax` algorithm. The AI aims to make the best possible move at each stage, either maximizing or minimizing the outcome based on the current player's perspective.
+**Play it now → [officiel-tinkerthink.github.io/AI-against-Tic-Tac-Toe](https://officiel-tinkerthink.github.io/AI-against-Tic-Tac-Toe/)**
 
-## AI Logic and Strategy
+An unbeatable minimax AI that **shows its thinking** — the value of every move, how many positions it searched with and
+without alpha-beta pruning, a grade for each of your moves, and an explorer for the entire game tree.
 
-The AI uses the `Minimax` algorithm to evaluate each possible game state, ensuring it plays optimally. The functions in this project support the game's rules, logic, and decision-making process for the AI.
+[![Live demo](https://img.shields.io/badge/live%20demo-play%20in%20browser-22d3ee?style=for-the-badge&logo=github)](https://officiel-tinkerthink.github.io/AI-against-Tic-Tac-Toe/)
+![Minimax + alpha-beta](https://img.shields.io/badge/AI-minimax%20%2B%20alpha--beta-fb7185?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-JS%20%2B%20Python-34d399?style=for-the-badge)
 
-## Implementation Tasks
+<img src="assets/demo.gif" alt="Demo: playing against the AI with move values shown, grading a blunder, exploring the game tree, watching AI vs AI" width="800">
 
-Complete the following methods in `tictactoe.py`:
+</div>
 
-### Core Functions
+---
 
-1. **`player(board)`**: Determines the current player (`X` or `O`) for the given board state.
-   - In the initial state, `X` moves first. After each move, players alternate turns.
-   - Any output is acceptable if a terminal (completed) board is given.
+## What's inside
 
-2. **`actions(board)`**: Returns a set of all possible moves for the given board.
-   - Each move is represented as a tuple `(i, j)` where `i` is the row (0, 1, or 2) and `j` is the column (0, 1, or 2).
-   - Possible moves are limited to empty cells.
-   - For terminal boards, any return value is acceptable.
+| | |
+|---|---|
+| **Three opponents** | **Easy** plays randomly. **Medium** runs minimax but only two moves deep — it takes wins and blocks threats, but walks into forks. **Hard** searches to the end and cannot be beaten. |
+| **Move values on the board** | Every empty cell is labelled *win / draw / loss* — what that move leads to against perfect play. Turn it off when you want a real fight. |
+| **Move grading** | Each of your moves is rated **best**, **mistake** (threw away a win) or **blunder** (turned a draw into a loss), with Undo to try again and a Hint that shows the best move. |
+| **AI thinking panel** | After every AI move: nodes searched with alpha-beta vs. without (549,945 → 34,202 on the opening move), time taken, the value of the position, and the value of each candidate. |
+| **Game-tree explorer** | Click through every reachable position with its minimax value and per-subtree node counts; count the whole tree (255,168 games, 5,478 positions) in your browser. |
+| **Modes** | Me vs AI (as X or O), two-player hot-seat, AI vs AI to watch. Scores per difficulty, move accuracy, achievements, sound, keyboard (1–9, N, Z, H). |
 
-3. **`result(board, action)`**: Returns a new board state based on the specified action without modifying the original board.
-   - Raises an exception if the action is invalid.
-   - Creates a deep copy of the board with the action applied to avoid altering the original.
+<div align="center">
+<img src="assets/play.png" alt="Board with move values and the AI thinking panel" width="800">
+<br><br>
+<img src="assets/tree.png" alt="Game-tree explorer" width="800">
+</div>
 
-4. **`winner(board)`**: Determines the winner, if any, on the current board.
-   - Returns `X` if `X` has won, `O` if `O` has won, or `None` if there is no winner.
-   - A win is defined by three identical marks in a row, column, or diagonal.
+## Run it locally
 
-5. **`terminal(board)`**: Checks if the game is over.
-   - Returns `True` if a player has won or all cells are filled without a winner.
-   - Returns `False` if the game is still ongoing.
+Static web app — no build step, no dependencies.
 
-6. **`utility(board)`**: Calculates the utility value of a terminal board.
-   - Returns `1` if `X` has won, `-1` if `O` has won, and `0` for a tie.
-   - Assumes the board is terminal when called.
+```bash
+git clone https://github.com/Officiel-TinkerThink/AI-against-Tic-Tac-Toe.git
+cd AI-against-Tic-Tac-Toe
+python3 -m http.server 8000 --directory docs     # or: npm start
+```
 
-7. **`minimax(board)`**: Determines the optimal move for the player on the given board.
-   - Returns the optimal action `(i, j)` among allowable moves.
-   - If multiple moves are equally optimal, any may be chosen.
-   - For terminal boards, returns `None`.
+### Tests
 
+```bash
+node --test tests/*.test.js          # rules, textbook node counts, fork-blindness of depth-2, perfect play, grading, tree stats
+python3 -m unittest discover tests   # original Python minimax
+```
 
-## Usage:
+## Project layout
 
-Requires Python(3) and Python package installer pip(3) to run:
+```
+docs/               ← web app (GitHub Pages)
+  js/ttt.js         port of tictactoe.py + alpha-beta, depth limit, per-move evals, tree statistics
+  js/app.js         board UI, grading, thinking panel, tree explorer, stats
+tictactoe.py        ← the original CS50-AI minimax
+runner.py           ← the original pygame UI (python3 runner.py)
+tests/              ← node:test + unittest suites
+scripts/            ← Playwright demo recorder
+assets/             ← demo GIF/MP4, screenshots, font for pygame
+```
 
-Install requirements:
-$pip3 install -r requirements.txt
+## How it works
 
-Run Game:
-$python3 runner.py
+**Minimax.** Every finished board gets a utility: +1 X wins, −1 O wins, 0 draw. On X's turn a position is worth the
+*max* over its moves, on O's turn the *min*. From the empty board the value is 0 — perfect play always draws.
 
-## Demo Video:
-Check out a [demo video](https://drive.google.com/file/d/14lhgdW1Nfqcc3N3MKdeFUBcXElHv09i9/view?usp=sharing) to see the Tic-Tac-Toe AI in action!
+**Alpha-beta pruning** (the README's "further idea", now implemented): keep α (best X can already force) and β (best O can);
+stop exploring a branch once α ≥ β because it can't change the decision. Same move, a fraction of the work:
 
+| Position | Minimax nodes | Alpha-beta nodes |
+|---|---|---|
+| Empty board | 549,945 | 34,202 |
+| After X in the centre | 55,504 | 8,465 |
+| After X in a corner | 59,704 | 6,304 |
 
+**Depth-adjusted values.** Wins found sooner score slightly higher than wins found later, so the AI finishes fast and
+delays losses — giving a human the most chances to slip.
 
-## Further Ideas:
+## The original
 
-* Applying Alpha-Beta Pruning for better efficiency.
+`tictactoe.py` (CS50-AI) with a pygame runner: `pip install -r requirements.txt && python3 runner.py`.
+Demo video of the pygame version: [Google Drive](https://drive.google.com/file/d/14lhgdW1Nfqcc3N3MKdeFUBcXElHv09i9/view?usp=sharing).
+
+## Author
+
+**Wahyu Bornok Augus Sinurat** — [@Officiel-TinkerThink](https://github.com/Officiel-TinkerThink) · MIT License

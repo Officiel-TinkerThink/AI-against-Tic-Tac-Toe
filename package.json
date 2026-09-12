@@ -1,0 +1,9 @@
+{
+  "name": "ai-against-tic-tac-toe",
+  "version": "2.0.0",
+  "description": "Tic-Tac-Toe against a perfect minimax AI that shows its thinking: move values, alpha-beta node counts, a game-tree explorer and move grading.",
+  "private": true,
+  "scripts": { "start": "python3 -m http.server 8000 --directory docs", "test": "node --test tests/*.test.js", "demo:record": "node scripts/record_demo.js" },
+  "devDependencies": { "playwright": "^1.62.1" },
+  "license": "MIT"
+}

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tic-Tac-Toe vs Minimax</title>
+  <meta name="description" content="Play Tic-Tac-Toe against a perfect minimax AI, see the value of every move, compare minimax with alpha-beta pruning, and explore the whole game tree." />
+  <meta property="og:title" content="Tic-Tac-Toe vs Minimax" />
+  <meta property="og:description" content="An unbeatable AI that shows its thinking: move evaluations, alpha-beta node counts, a game-tree explorer, and move-quality feedback on your play." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%231a1433'/><path d='M22 22 L46 46 M46 22 L22 46' stroke='%2322d3ee' stroke-width='9' stroke-linecap='round'/><circle cx='68' cy='68' r='13' fill='none' stroke='%23fb7185' stroke-width='9'/></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true"><b class="x">✕</b><b class="o">◯</b></span>
+      <div>
+        <h1>Tic-Tac-Toe <span class="vs">vs</span> Minimax</h1>
+        <p>An unbeatable AI that shows its thinking</p>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="play" role="tab">Play</button>
+      <button class="tab" data-tab="tree" role="tab">Explore the tree</button>
+      <button class="tab" data-tab="about" role="tab">How it works</button>
+    </nav>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost toggle" id="btnSound" aria-pressed="true" title="Toggle sound">🔊</button>
+      <a class="btn btn-ghost" href="https://github.com/Officiel-TinkerThink/AI-against-Tic-Tac-Toe" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </header>
+
+  <main class="page">
+    <!-- ============================================================ PLAY -->
+    <section class="tab-body active" data-tab="play">
+      <div class="play-grid">
+        <div class="card board-card">
+          <div class="status" id="status">Your move</div>
+          <svg id="board" class="board" viewBox="0 0 300 300" role="grid" aria-label="Tic-tac-toe board"></svg>
+          <div class="moves" id="moves"></div>
+          <div class="banner" id="banner" hidden></div>
+        </div>
+
+        <aside class="card side-card">
+          <div class="field">
+            <label for="mode">Mode</label>
+            <select id="mode">
+              <option value="ai">Me vs AI</option>
+              <option value="two">Two players (hot-seat)</option>
+              <option value="watch">AI vs AI (watch)</option>
+            </select>
+          </div>
+          <div class="field" id="sideField">
+            <label for="side">I play</label>
+            <select id="side">
+              <option value="X">X — I move first</option>
+              <option value="O">O — the AI moves first</option>
+            </select>
+          </div>
+          <div class="field" id="levelField">
+            <label for="level">Difficulty</label>
+            <select id="level">
+              <option value="easy">Easy — random moves</option>
+              <option value="medium">Medium — looks 2 moves ahead</option>
+              <option value="hard" selected>Hard — perfect minimax</option>
+            </select>
+            <p class="hint" id="levelHint"></p>
+          </div>
+          <div class="field row">
+            <label class="check"><input type="checkbox" id="chkEval" checked /> Show the value of every move on the board</label>
+            <label class="check"><input type="checkbox" id="chkFeedback" checked /> Grade my moves (best / mistake / blunder)</label>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary" id="btnNew">New game</button>
+            <button class="btn" id="btnUndo" title="Take back your last move (Z)">Undo</button>
+            <button class="btn" id="btnHint" title="Show the best move (H)">Hint</button>
+          </div>
+
+          <div class="score" id="score"></div>
+
+          <div class="thinking">
+            <h3>AI thinking</h3>
+            <div class="think-box" id="think">Make a move and the AI will show what it searched.</div>
+            <div class="evals" id="evals"></div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="card stats-card">
+        <div class="stat-tiles" id="stats"></div>
+        <ul class="achievements" id="achievements"></ul>
+      </div>
+    </section>
+
+    <!-- ============================================================ TREE -->
+    <section class="tab-body" data-tab="tree">
+      <div class="card">
+        <h2>Explore the game tree</h2>
+        <p class="lead">Every position the AI can reach, with its minimax value. Click a child to descend, use the breadcrumb to go back. Green = the mover can force a win, grey = best play draws, red = the mover is lost. The numbers under each child are how many nodes a full minimax search of that subtree visits, with and without alpha-beta pruning.</p>
+        <div class="crumbs" id="crumbs"></div>
+        <div class="tree-grid">
+          <div class="tree-current">
+            <svg id="treeBoard" class="board board-mid" viewBox="0 0 300 300"></svg>
+            <div class="tree-info" id="treeInfo"></div>
+          </div>
+          <div class="tree-children" id="treeChildren"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h2>The whole game tree</h2>
+        <p class="lead">Counted by walking every legal continuation from the empty board (takes a moment in your browser):</p>
+        <div class="stat-tiles" id="treeStats"><button class="btn btn-primary" id="btnCount">Count it</button></div>
+      </div>
+    </section>
+
+    <!-- ============================================================ ABOUT -->
+    <section class="tab-body" data-tab="about">
+      <div class="about-grid">
+        <article class="card prose">
+          <h2>Minimax</h2>
+          <p>Tic-Tac-Toe is small enough to solve completely. The AI assigns every finished board a <b>utility</b>: +1 if X won, −1 if O won, 0 for a draw. Then it reasons backwards: on X's turn the value of a position is the <b>max</b> over the moves' values, on O's turn the <b>min</b> — each side assumes the other plays perfectly.</p>
+          <pre>value(board):
+  if terminal(board): return utility(board)
+  if player(board) == X: return max(value(result(board, a)) for a in actions(board))
+  else:                  return min(value(result(board, a)) for a in actions(board))</pre>
+          <p>From the empty board the value is <b>0</b>: with perfect play the game is always a draw. That's why the Hard AI can never lose — and why you can never beat it. The best you can do is draw; every "win" is a draw you failed to reach.</p>
+          <h3>Depth-adjusted values</h3>
+          <p>A plain ±1 doesn't distinguish "win now" from "win in five moves". The engine nudges values by the depth (<code>1.09</code> beats <code>1.05</code>) so the AI takes the quickest win and postpones a loss as long as possible — giving you the most chances to slip.</p>
+        </article>
+        <article class="card prose">
+          <h2>Alpha-beta pruning</h2>
+          <p>Minimax from the empty board visits <b>549,945</b> nodes. Most of that work is wasted: once X has found a move that guarantees a draw, it doesn't need to fully explore an alternative that O can already answer with something worse. Alpha-beta keeps two bounds — α, the best X can already secure; β, the best O can — and abandons any branch that can't change the decision.</p>
+          <pre>if player == X: alpha = max(alpha, best); if alpha >= beta: stop
+else:           beta  = min(beta,  best); if alpha >= beta: stop</pre>
+          <p>Same answer, <b>34,202</b> nodes instead of 549,945 — a 16× cut on the first move, and the ratio grows with the branching factor in bigger games (chess engines would be nowhere without it). Watch the two numbers side by side in the <b>AI thinking</b> panel after every move.</p>
+          <h3>Difficulty levels</h3>
+          <ul>
+            <li><b>Easy</b> plays a random legal move.</li>
+            <li><b>Medium</b> runs the same search but stops two moves ahead, scoring unfinished positions 0 — so it takes wins and blocks threats, but walks into forks.</li>
+            <li><b>Hard</b> searches to the end: perfect play.</li>
+          </ul>
+          <p class="hint">Original Python implementation: <code>tictactoe.py</code> (CS50-AI). The browser engine <code>docs/js/ttt.js</code> ports it and adds pruning, depth limits and the tree statistics.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Built by <a href="https://github.com/Officiel-TinkerThink" target="_blank" rel="noopener">Wahyu Bornok Augus Sinurat</a> · minimax agent from the CS50-AI Tic-Tac-Toe project · everything runs in your browser.
+  </footer>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script src="js/ttt.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
